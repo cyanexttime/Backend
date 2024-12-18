@@ -9,10 +9,11 @@ import os
 app = Flask(__name__)
 
 # Connect to MongoDB
-client = MongoClient(
-    "mongodb+srv://khangvx8803:zg2vEqu9twyEsCyN@potholescanner.grygu.mongodb.net/?retryWrites=true&w=majority&appName=PotholeScanner:3000/"
-)  # Adjust the host and port if needed
-db = client["osm_data"]  # Database name
+# client = MongoClient(
+#     "mongodb+srv://khangvx8803:zg2vEqu9twyEsCyN@potholescanner.grygu.mongodb.net/?retryWrites=true&w=majority&appName=PotholeScanner:3000/"
+# )  # Adjust the host and port if needed
+client = MongoClient("mongodb://localhost:27017/")
+db = client["osm_data_1"]  # Database name
 nodes_collection = db.nodes
 edges_collection = db.edges
 
@@ -94,8 +95,13 @@ def render_map():
     map_path = "map.html"
     m.save(map_path)
 
-    # Return the map file URL
-    return jsonify({"map_url": f"http://localhost:5000/static/{map_path}"})
+    path_coords = []
+    for node in path:
+        node_geom = G.nodes[node]["geometry"]
+        path_coords.append({"lat": node_geom.y, "lon": node_geom.x})
+
+    # Return the path as a JSON response
+    return jsonify({"path": path_coords})
 
 
 if __name__ == "__main__":
