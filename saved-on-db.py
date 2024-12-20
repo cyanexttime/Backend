@@ -5,12 +5,16 @@ from shapely.geometry import mapping  # Import the mapping function
 # Connect to MongoDB
 client = MongoClient(
     "mongodb+srv://khangvx8803:zg2vEqu9twyEsCyN@potholescanner.grygu.mongodb.net/?retryWrites=true&w=majority&appName=PotholeScanner:3000/"
-)  # Adjust the host and port if needed
-db = client["osm_data"]  # Database name
+)
+# client = MongoClient("mongodb://localhost:27017/")  # Adjust the host and port if needed
+db = client["osm_data_bike"]  # Database name
 
-# Download a street network
+# # Download a street network
+# print("Downloading data...")
+# G = ox.graph_from_place("Ho Chi Minh, Vietnam", network_type="drive")
+
 print("Downloading data...")
-G = ox.graph_from_place("Ho Chi Minh, Vietnam", network_type="drive")
+G = ox.graph_from_place("Ho Chi Minh, Vietnam", network_type="bike")
 
 # Convert to GeoDataFrames
 print("Converting data to GeoDataFrames...")
