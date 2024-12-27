@@ -2,42 +2,59 @@ import osmnx as ox
 from pymongo import MongoClient
 from shapely.geometry import mapping  # Import the mapping function
 
+# # Connect to MongoDB
+# client = MongoClient(
+#     "mongodb+srv://khangvx8803:zg2vEqu9twyEsCyN@potholescanner.grygu.mongodb.net/?retryWrites=true&w=majority&appName=PotholeScanner:3000/"
+# )
 # Connect to MongoDB
-client = MongoClient(
-    "mongodb+srv://khangvx8803:zg2vEqu9twyEsCyN@potholescanner.grygu.mongodb.net/?retryWrites=true&w=majority&appName=PotholeScanner:3000/"
-)
-# client = MongoClient("mongodb://localhost:27017/")  # Adjust the host and port if needed
-db = client["osm_data_bike"]  # Database name
+client = MongoClient("mongodb://localhost:27017/")  # Adjust the host and port if needed
+db = client["osm_data"]  # Database name
 
-# # Download a street network
-# print("Downloading data...")
-# G = ox.graph_from_place("Ho Chi Minh, Vietnam", network_type="drive")
+# List of places to download data for
+places = [
+    "Ho Chi Minh City, Vietnam",
+    "Thủ Đức, Ho chi minh city, Vietnam",
+    "Dong Hoa, Dĩ An, Vietnam",
+]
+# Network type (drive, bike, walk, etc.)
+network_type = "bike"  # Set the desired network type
 
-print("Downloading data...")
-G = ox.graph_from_place("Ho Chi Minh, Vietnam", network_type="bike")
+for place in places:
+    print(f"Downloading data for {place}...")
 
-# Convert to GeoDataFrames
-print("Converting data to GeoDataFrames...")
-nodes, edges = ox.graph_to_gdfs(G)
+    # Download a street network for the place
+    try:
+        G = ox.graph_from_place(place, network_type=network_type)
+    except Exception as e:
+        print(f"Error downloading data for {place}: {e}")
+        continue
 
-# Reset index and convert geometries to GeoJSON format
-print("Preparing nodes data...")
-nodes["geometry"] = nodes["geometry"].apply(
-    mapping
-)  # Convert Shapely geometries to GeoJSON
-nodes_data = nodes.reset_index().to_dict(orient="records")
+    # Convert to GeoDataFrames
+    print(f"Converting data to GeoDataFrames for {place}...")
+    nodes, edges = ox.graph_to_gdfs(G)
 
-print("Preparing edges data...")
-edges["geometry"] = edges["geometry"].apply(
-    mapping
-)  # Convert Shapely geometries to GeoJSON
-edges_data = edges.reset_index().to_dict(orient="records")
+    # Reset index and convert geometries to GeoJSON format
+    print(f"Preparing nodes data for {place}...")
+    nodes["geometry"] = nodes["geometry"].apply(
+        mapping
+    )  # Convert Shapely geometries to GeoJSON
+    nodes["place"] = place  # Add a field to indicate the place
+    nodes_data = nodes.reset_index().to_dict(orient="records")
 
-# Save nodes and edges to MongoDB
-print("Saving nodes to MongoDB...")
-db.nodes.insert_many(nodes_data)
+    print(f"Preparing edges data for {place}...")
+    edges["geometry"] = edges["geometry"].apply(
+        mapping
+    )  # Convert Shapely geometries to GeoJSON
+    edges["place"] = place  # Add a field to indicate the place
+    edges_data = edges.reset_index().to_dict(orient="records")
 
-print("Saving edges to MongoDB...")
-db.edges.insert_many(edges_data)
+    # Save nodes and edges to MongoDB
+    print(f"Saving nodes to MongoDB for {place}...")
+    db.nodes.insert_many(nodes_data)
 
-print("Data saved successfully!")
+    print(f"Saving edges to MongoDB for {place}...")
+    db.edges.insert_many(edges_data)
+
+    print(f"Data for {place} saved successfully!")
+
+print("All data saved successfully!")

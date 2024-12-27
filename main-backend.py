@@ -8,12 +8,12 @@ import os
 
 app = Flask(__name__)
 
-# Connect to MongoDB
-client = MongoClient(
-    "mongodb+srv://khangvx8803:zg2vEqu9twyEsCyN@potholescanner.grygu.mongodb.net/?retryWrites=true&w=majority&appName=PotholeScanner:3000/"
-)  # Adjust the host and port if needed
-# client = MongoClient("mongodb://localhost:27017/")
-db = client["osm_data_bike"]  # Database name
+# # Connect to MongoDB
+# client = MongoClient(
+#     "mongodb+srv://khangvx8803:zg2vEqu9twyEsCyN@potholescanner.grygu.mongodb.net/?retryWrites=true&w=majority&appName=PotholeScanner:3000/"
+# )  # Adjust the host and port if needed
+client = MongoClient("mongodb://localhost:27017/")
+db = client["osm_data"]  # Database name
 nodes_collection = db.nodes
 edges_collection = db.edges
 
