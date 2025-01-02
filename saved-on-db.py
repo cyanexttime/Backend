@@ -2,12 +2,12 @@ import osmnx as ox
 from pymongo import MongoClient
 from shapely.geometry import mapping  # Import the mapping function
 
-# # Connect to MongoDB
-# client = MongoClient(
-#     "mongodb+srv://khangvx8803:zg2vEqu9twyEsCyN@potholescanner.grygu.mongodb.net/?retryWrites=true&w=majority&appName=PotholeScanner:3000/"
-# )
 # Connect to MongoDB
-client = MongoClient("mongodb://localhost:27017/")  # Adjust the host and port if needed
+client = MongoClient(
+    "mongodb+srv://khangvx8803:zg2vEqu9twyEsCyN@potholescanner.grygu.mongodb.net/?retryWrites=true&w=majority&appName=PotholeScanner:3000/"
+)
+# Connect to MongoDB
+# client = MongoClient("mongodb://localhost:27017/")  # Adjust the host and port if needed
 db = client["osm_data"]  # Database name
 
 # List of places to download data for
